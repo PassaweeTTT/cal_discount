@@ -130,3 +130,4 @@ dist
 .pnp.*
 /api/obj
 /.vs
+/api/bin
