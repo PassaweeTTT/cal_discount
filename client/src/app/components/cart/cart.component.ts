@@ -2,6 +2,10 @@ import { CommonModule } from '@angular/common';
 import { Component, Input, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Cart } from '../../models/cart.model';
+import { catchError, of } from 'rxjs';
+import { HttpErrorResponse } from '@angular/common/http';
+import { catchErrorHandler } from '../../utils/handler';
+import { CartService } from '../../services/cart.service';
 
 @Component({
     selector: 'app-cart',
@@ -21,7 +25,9 @@ export class CartComponent implements OnInit {
     public discount: number = 0;
     public finalAmount: number = 0;
 
-    constructor() { }
+    constructor(
+        private cartService: CartService,
+    ) { }
 
     ngOnInit(): void {
     }
@@ -44,11 +50,13 @@ export class CartComponent implements OnInit {
     }
 
     public applyCoupon(code: string): void {
-        if (code && !this.appliedCoupons.includes(code)) {
-            this.appliedCoupons.push(code);
-            this.couponCode = '';
-            this.calculateFinalAmount();
-        }
+        this.cartService.checkout(this.cart).pipe(
+            catchError((error: HttpErrorResponse) => {
+                return catchErrorHandler(error);
+            })
+        ).subscribe(() => {
+            alert('Coupon applied successfully!');
+        })
     }
 
     public removeCoupon(code: string): void {

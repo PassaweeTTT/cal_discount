@@ -21,3 +21,15 @@ export interface Product {
     category: string;
     isCustom?: boolean;
 }
+
+export interface CheckoutModel {
+    cart: Cart;
+    coupon: Coupon[];
+}
+
+export interface Coupon {
+    code: string;
+    amount: number;
+    isPercent: boolean;
+    category: string;
+}
