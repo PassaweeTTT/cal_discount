@@ -83,12 +83,6 @@
   gap: 12px;
 }
 
-.coupon-section input {
-  padding: 10px;
-  margin-right: 10px;
-  width: 100%;
-}
-
 .cart-summary {
   margin-top: 20px;
 }
@@ -132,6 +126,7 @@ button:hover {
   padding: 10px;
   border: 1px solid #ddd;
   border-radius: 8px;
+  background-color: #fff;
 }
 
 .coupon-header {
@@ -154,6 +149,16 @@ button:hover {
 /* mini */
 .copy-btn {
   background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.remove-btn {
+  background-color: #af0600;
   color: white;
   border: none;
   padding: 5px 10px;

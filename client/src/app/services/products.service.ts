@@ -10,16 +10,11 @@ export class ProductsService {
 
     public getDefaultProducts(): Product[] {
         return [
-            { id: 1, name: 'Product 1', price: 299, imageUrl: 'https://via.placeholder.com/300', description: 'Description for Product 1', category: 'Category A', },
-            { id: 2, name: 'Product 2', price: 199, imageUrl: 'https://via.placeholder.com/300', description: 'Description for Product 2', category: 'Category B', },
-            { id: 3, name: 'Product 3', price: 399, imageUrl: 'https://via.placeholder.com/300', description: 'Description for Productivity i like buy', category: 'Category A', },
-            { id: 4, name: 'Product 4', price: 499, imageUrl: 'https://via.placeholder.com/300', description: 'Description for Product 4', category: 'Category C', },
-            { id: 5, name: 'Product 5', price: 599, imageUrl: 'https://via.placeholder.com/300', description: 'Description for Product 5', category: 'Category B', },
-            { id: 6, name: 'Product 6', price: 699, imageUrl: 'https://via.placeholder.com/300', description: 'Description for Product 6', category: 'Category A', },
-            { id: 7, name: 'Product 7', price: 799, imageUrl: 'https://via.placeholder.com/300', description: 'Description for Product 7', category: 'Category C', },
-            { id: 8, name: 'Product 8', price: 899, imageUrl: 'https://via.placeholder.com/300', description: 'Description for Product 8', category: 'Category B', },
-            { id: 9, name: 'Product 9', price: 999, imageUrl: 'https://via.placeholder.com/300', description: 'Description for Product 9', category: 'Category A', },
-            { id: 10, name: 'Product 10', price: 1099, imageUrl: 'https://via.placeholder.com/300', description: 'Description for Product 10', category: 'Category C', }
+            { id: 1, name: 'Blue Sneaker', price: 1499, imageUrl: 'images/products/shoes_1.jpg', description: '', category: 'Shoes', },
+            { id: 2, name: 'Cool Shirt', price: 1050, imageUrl: 'images/products/shirt_1.jpg', description: '', category: 'Shirt', },
+            { id: 3, name: 'Cooler Shirt', price: 1051, imageUrl: 'images/products/shirt_2.jpg', description: '', category: 'Shirt', },
+            { id: 4, name: 'Long Pant', price: 1200, imageUrl: 'images/products/pant_1.jpg', description: '', category: 'Pant', },
+            { id: 5, name: 'What Watch', price: 4500, imageUrl: 'images/products/watch_1.jpg', description: '', category: 'Watch', },
         ]
     }
 

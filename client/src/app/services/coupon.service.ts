@@ -1,16 +1,23 @@
 import { Injectable } from '@angular/core';
 import { Coupon } from '../models/coupon.model';
+import { EnumCouponType } from '../Enums/enumCategory';
 
 @Injectable({
     providedIn: 'root'
 })
 export class CouponService {
 
+    private EnumCouponType = EnumCouponType;
     constructor() { }
 
     private coupons: Coupon[] = [
-        { description: 'Discount 10 Baht', code: 'DISCOUNT10', amount: 10, isPercent: false, category: 'Coupon' },
-        { description: 'Discount 20 %', code: 'SAVE20', amount: 20, isPercent: true, category: 'Coupon' },
+        { description: 'Discount 10 Baht', code: 'N10', amount: 10, isPercent: false, category: this.EnumCouponType.Coupon },
+        { description: 'Discount 50 Baht', code: 'N50', amount: 50, isPercent: false, category: this.EnumCouponType.Coupon },
+        { description: 'Summer Save 10%', code: 'SUMMER10', amount: 10, isPercent: true, category: this.EnumCouponType.Coupon },
+        { description: 'Summer Save 20%', code: 'SUMMER20', amount: 20, isPercent: true, category: this.EnumCouponType.Coupon },
+        { description: 'NEW LIVE NEW SHIRT', code: 'NEWSHIRT', amount: 15, isPercent: true, category: this.EnumCouponType.OnTop, unit: 'Shirt' },
+        { description: 'WE RUN', code: 'WERUN', amount: 12, isPercent: true, category: this.EnumCouponType.OnTop, unit: 'Shoes' },
+        { description: 'Black Friday', code: 'BFDAY', amount: 50, isPercent: false, category: this.EnumCouponType.Seasonal, every: 500 },
     ];
 
     public getDefaultCoupons() {
@@ -44,6 +51,11 @@ export class CouponService {
     public addCustomCoupon(coupon: Coupon): boolean {
         const coupons = this.getCustomCoupons();
 
+        if (!coupon.category) {
+            alert('Coupon Category is required!');
+            return false;
+        }
+
         if (!coupon.description) {
             alert('Coupon Name is required!');
             return false;
@@ -62,6 +74,20 @@ export class CouponService {
                 return false;
             } else if (!coupon.isPercent && coupon.amount < 0) {
                 alert('Coupon Amount must be greater than 0 for fixed amount!');
+                return false;
+            }
+        }
+
+        if (coupon.category === 'OnTop') {
+            if (!coupon.unit) {
+                alert('Category to Discount is required!');
+                return false;
+            }
+        }
+
+        if (coupon.category === 'Seasonal') {
+            if (!coupon.every) {
+                alert('Discount Every (฿) is required!');
                 return false;
             }
         }

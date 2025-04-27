@@ -5,4 +5,7 @@ export interface Coupon {
     isPercent: boolean;
     category: string;
     isCustom?: boolean;
+    isPoint?: boolean;
+    unit?: string;
+    every?: number;
 }

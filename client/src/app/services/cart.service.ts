@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { Cart } from '../models/cart.model';
+import { CheckoutModel, ResponseModel } from '../models/cart.model';
 
 @Injectable({
     providedIn: 'root'
@@ -13,7 +13,7 @@ export class CartService {
         private http: HttpClient,
     ) { }
 
-    public checkout(cart: Cart): Observable<any> {
-        return this.http.post<any>(`${this.url}Checkout`, cart);
+    public checkout(cart: CheckoutModel): Observable<ResponseModel> {
+        return this.http.post<ResponseModel>(`${this.url}Checkout`, cart);
     }
 }

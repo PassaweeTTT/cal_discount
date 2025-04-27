@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Cart } from '../../models/cart.model';
+import { Cart, CheckoutModel, ResponseModel } from '../../models/cart.model';
 import { catchError } from 'rxjs';
 import { HttpErrorResponse } from '@angular/common/http';
 import { catchErrorHandler } from '../../utils/handler';
@@ -9,11 +9,14 @@ import { CartService } from '../../services/cart.service';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { Coupon } from '../../models/coupon.model';
 import { CouponService } from '../../services/coupon.service';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
+import { EnumCouponType } from '../../Enums/enumCategory';
 
 @Component({
     selector: 'app-cart',
     standalone: true,
-    imports: [CommonModule, FormsModule],
+    imports: [CommonModule, FormsModule, BsDropdownModule],
     templateUrl: './cart.component.html',
     styleUrl: './cart.component.css',
     providers: [BsModalService],
@@ -27,6 +30,9 @@ export class CartComponent implements OnInit {
         totalAmount: 0
     }
 
+    public EnumCouponType = EnumCouponType;
+    public response?: ResponseModel;
+
     public couponList: Coupon[] = [];
     public newCoupon: Coupon = {
         description: '',
@@ -36,9 +42,11 @@ export class CartComponent implements OnInit {
         category: '',
     };
 
-    public couponInput: string = '';
-    public couponCode: string = '';
+    public couponUseList: Coupon[] = [];
+
     public modalRef?: BsModalRef;
+    public isUsePoint: boolean = false;
+    public pointAmount: number = 0;
 
     constructor(
         private cartService: CartService,
@@ -65,29 +73,20 @@ export class CartComponent implements OnInit {
         this.cart.totalAmount = this.cart.items.reduce((total, item) => total + item.totalPrice, 0);
     }
 
-    public applyCoupon(): void {
-        if (!this.couponInput) {
-            alert('Please enter a Coupon!');
-            return;
+    public checkout(): void {
+        let checkoutParam: CheckoutModel = {
+            cart: this.cart,
+            coupon: this.couponUseList,
+            isPoint: this.isUsePoint,
+            pointAmount: this.pointAmount || 0
         }
 
-        const coupon = this.couponList.find(c => c.code === this.couponInput);
-        if (!coupon) {
-            alert('Invalid Coupon!');
-            return;
-        }
-
-        alert(`Coupon applied: ${coupon.description}`);
-        this.couponCode = this.couponInput;
-    }
-
-    public validateCoupon(): void {
-        this.cartService.checkout(this.cart).pipe(
+        this.cartService.checkout(checkoutParam).pipe(
             catchError((error: HttpErrorResponse) => {
                 return catchErrorHandler(error);
             })
-        ).subscribe(() => {
-            alert('Coupon applied successfully!');
+        ).subscribe((res: ResponseModel) => {
+            this.response = res;
         })
     }
 
@@ -102,7 +101,7 @@ export class CartComponent implements OnInit {
             code: '',
             amount: 0,
             isPercent: false,
-            category: 'Coupon',
+            category: '',
             isCustom: true,
         };
 
@@ -127,6 +126,12 @@ export class CartComponent implements OnInit {
     }
 
     public onDeleteCoupon(code: string): void {
+        if (!confirm('Are you sure you want to delete this coupon?')) {
+            return;
+        }
+
+        this.couponUseList = this.couponUseList.filter(c => c.code !== code);
+
         const isDeleted = this.couponService.removeCustomCoupon(code);
         if (!isDeleted) {
             return;
@@ -134,9 +139,77 @@ export class CartComponent implements OnInit {
         this.couponList = this.couponService.getCoupons();
     }
 
-    public onApplyFromList(text: string): void {
-        this.couponCode = text;
-        this.couponInput = text;
-        this.modalRef?.hide();
+    public onApplyFromList(coupon: Coupon): void {
+        if (this.couponUseList.some(c => c.code === coupon.code)) {
+            return;
+        }
+
+        if (this.couponUseList.some(c => c.category === coupon.category && c.code !== coupon.code)) {
+            const text = 'You can only use one coupon per category!';
+            alert(text);
+            return;
+        }
+
+        if (this.isUsePoint && coupon.category === EnumCouponType.OnTop) {
+            const text = 'You can not use Point together with "On Top" coupon!';
+            this.isUsePoint = false;
+            this.pointAmount = 0;
+        }
+
+        this.couponUseList.push(coupon);
+        // this.modalRef?.hide();
+    }
+
+    public onRemoveFromList(coupon: Coupon): void {
+        this.couponUseList = this.couponUseList.filter(c => c.code !== coupon.code);
+        // this.modalRef?.hide();1
+    }
+
+    public getCategoryText(): string {
+        if (this.newCoupon.category) {
+            if (this.newCoupon.category === EnumCouponType.Coupon) {
+                return EnumCouponType.Coupon;
+            } else if (this.newCoupon.category === EnumCouponType.Seasonal) {
+                return EnumCouponType.Seasonal;
+            } else if (this.newCoupon.category === EnumCouponType.OnTop) {
+                return 'On Top';
+            }
+        }
+
+        return 'Select Category';
+    }
+
+    public selectCategory(category: string): void {
+        if (category == this.newCoupon.category) {
+            return;
+        }
+
+        if (this.newCoupon.category === EnumCouponType.Seasonal) {
+            this.newCoupon.isPercent = false;
+        }
+        delete this.newCoupon.isPoint;
+        delete this.newCoupon.unit;
+        delete this.newCoupon.every;
+
+        this.newCoupon.category = category;
+    }
+
+    public onPointAmountChange(): void {
+        if (this.isUsePoint) {
+            this.pointAmount = 0;
+            const onTop = this.couponUseList.find(c => c.category === EnumCouponType.OnTop);
+            if (onTop) {
+                const text = 'You can only use one coupon "On Top" at a time!';
+                alert(text);
+                this.couponUseList = this.couponUseList.filter(c => c.category !== EnumCouponType.OnTop);
+            }
+        }
+    }
+
+    public canApplyCoupon(coupon: Coupon): boolean {
+        if (this.couponUseList.some(c => c.code === coupon.code)) {
+            return false;
+        }
+        return true;
     }
 }

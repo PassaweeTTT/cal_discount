@@ -38,8 +38,39 @@
             <label class="text-link" (click)="showCouponList()">Coupon List</label>
             <label class="text-link" (click)="showAddCouponModal()">Add New Coupon</label>
         </div>
-        <input [(ngModel)]="couponInput" placeholder="Coupon Code" />
-        <button (click)="applyCoupon()">Apply Coupon</button>
+        <div class="from-row">
+            <div class="d-flex gap-3 align-items-center">
+                <input type="checkbox" id="isUsePoint" name="isUsePoint" [(ngModel)]="isUsePoint"
+                    (change)="onPointAmountChange()">
+                <label for="isUsePoint">Use Point To Discount</label>
+            </div>
+            <input class="custom-input" id="pointAmount" name="pointAmount" [(ngModel)]="pointAmount" type="number"
+                *ngIf="isUsePoint" type="search" />
+        </div>
+
+        <div class="coupon-container" *ngIf="couponUseList.length > 0">
+            <label class="coupon-name">Coupon Apply</label>
+            <div *ngFor="let coupon of couponUseList" class="coupon-item">
+                <div class="coupon-header">
+                    <label class="coupon-name">{{coupon.description}}</label>
+                    <button class="remove-btn" (click)="onRemoveFromList(coupon)">
+                        Remove
+                    </button>
+                </div>
+                <div class="d-flex gap-3 align-items-center">
+                    <label class="coupon-name">Category : {{coupon.category}}</label>
+                </div>
+                <div class="d-flex gap-3 align-items-center">
+                    <label class="coupon-code">Code :{{coupon.code}}</label>
+                </div>
+                <div class="coupon-details">
+                    <label class="coupon-discount">Discount: {{ coupon.amount | number }} {{coupon.isPercent ?
+                        '%' : '฿'}}</label>
+                </div>
+            </div>
+        </div>
+
+        <button (click)="checkout()">Check Out</button>
     </div>
 </div>
 
@@ -60,9 +91,17 @@
                         (click)="onDeleteCoupon(coupon.code)">Delete</label>
                 </div>
                 <div class="d-flex gap-3 align-items-center">
-                    <label class="coupon-code">{{coupon.code}}</label>
-                    <button class="copy-btn" (click)="onApplyFromList(coupon.code)">
+                    <label class="coupon-name">Category : {{coupon.category}}</label>
+                </div>
+                <div class="d-flex gap-3 align-items-center">
+                    <label class="coupon-code">Code :{{coupon.code}}</label>
+
+                    <button class="copy-btn" (click)="onApplyFromList(coupon)" *ngIf="canApplyCoupon(coupon)">
                         Apply
+                    </button>
+
+                    <button class="remove-btn" (click)="onRemoveFromList(coupon)" *ngIf="!canApplyCoupon(coupon)">
+                        Remove
                     </button>
                 </div>
                 <div class="coupon-details">
@@ -87,21 +126,40 @@
     </div>
 
     <div class="modal-body">
+
+        <div class="btn-group" dropdown>
+            <button id="button-basic" dropdownToggle type="button" class="btn btn-primary dropdown-toggle"
+                aria-controls="dropdown-basic">
+                {{getCategoryText()}}<span class="caret"></span>
+            </button>
+            <ul id="dropdown-basic" *dropdownMenu class="dropdown-menu" role="menu" aria-labelledby="button-basic">
+                <li role="menuitem"><a class="dropdown-item" (click)="selectCategory(EnumCouponType.Coupon)">Coupon</a>
+                </li>
+                <li role="menuitem"><a class="dropdown-item" (click)="selectCategory(EnumCouponType.OnTop)">On Top</a>
+                </li>
+                <li role="menuitem"><a class="dropdown-item"
+                        (click)="selectCategory(EnumCouponType.Seasonal)">Seasonal</a></li>
+            </ul>
+        </div>
+
         <form (ngSubmit)="onConfirmAddCoupon()" #couponForm="ngForm">
 
-            <label class="coupon-name">Summary</label>
+            <label class="coupon-name"
+                *ngIf="newCoupon.description || newCoupon.code || newCoupon.amount">Summary</label>
 
-            <div class="coupon-item">
-                <div class="coupon-header">
+            <div class="coupon-item" *ngIf="newCoupon.description || newCoupon.code || newCoupon.amount">
+                <div class="coupon-header" *ngIf="newCoupon.description">
                     <label class="coupon-name">{{newCoupon.description}}</label>
                 </div>
-                <div class="d-flex gap-3 align-items-center">
-                    <label class="coupon-code">{{newCoupon.code}}</label>
-                    <button *ngIf="newCoupon.code" class="copy-btn" (click)="onApplyFromList(newCoupon.code)">
-                        Copy
-                    </button>
+                <div class="d-flex gap-3 align-items-center" *ngIf="newCoupon.category">
+                    <label class="coupon-name">Category : {{newCoupon.category}}</label>
                 </div>
-                <div class="coupon-details">
+
+                <div class="d-flex gap-3 align-items-center" *ngIf="newCoupon.code">
+                    <label class="coupon-code">{{newCoupon.code}}</label>
+                </div>
+
+                <div class="coupon-details" *ngIf="newCoupon.amount">
                     <label class="coupon-discount">Discount: {{ newCoupon.amount | number }} {{newCoupon.isPercent ?
                         '%' : '฿'}}</label>
                 </div>
@@ -120,14 +178,24 @@
                     type="text" />
             </div>
 
+            <div class="d-flex gap-3 " *ngIf="newCoupon.category != EnumCouponType.Seasonal">
+                <input type="checkbox" id="isPercent" name="isPercent" [(ngModel)]="newCoupon.isPercent">
+                <label for="isPercent">Percentage Discount</label><br>
+            </div>
+
             <div class="from-row">
-                <label require for="amount">Amout</label>
+                <label require for="amount">Amout {{newCoupon.isPercent ? '(%)' : '(฿)'}}</label>
                 <input class="custom-input" id="amount" name="amount" [(ngModel)]="newCoupon.amount" type="number" />
             </div>
 
-            <div class="d-flex gap-3 ">
-                <input type="checkbox" id="isPercent" name="isPercent" [(ngModel)]="newCoupon.isPercent">
-                <label for="isPercent">Percentage Discount</label><br>
+            <div class="from-row" *ngIf="newCoupon.category == EnumCouponType.OnTop">
+                <label require for="category">Category To Discount</label>
+                <input class="custom-input" id="category" name="category" [(ngModel)]="newCoupon.unit" type="text" />
+            </div>
+
+            <div class="from-row" *ngIf="newCoupon.category == EnumCouponType.Seasonal">
+                <label require for="every">Discount Every (฿)</label>
+                <input class="custom-input" id="every" name="every" [(ngModel)]="newCoupon.every" type="number" />
             </div>
 
             <div class="text-end">

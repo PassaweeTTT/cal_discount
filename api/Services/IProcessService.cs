@@ -4,6 +4,6 @@ namespace api.Services
 {
     public interface IProcessService
     {
-        public void ProcessCheckout(CheckoutModel param);
+        public ResponseModel ProcessCheckout(CheckoutModel param);
     }
 }
