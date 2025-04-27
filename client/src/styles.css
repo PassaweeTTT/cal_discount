@@ -15,3 +15,31 @@
     width: 100%;
     max-width: fit-content;
 }
+
+.text-link {
+    color: #2196F3;
+    cursor: pointer;
+    text-decoration: underline;
+    width: 100%;
+    max-width: fit-content;
+}
+
+.button-submit {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .button-submit:disabled {
+    background-color: #ddd;
+    cursor: not-allowed;
+  }
+  
+  .button-submit:hover {
+    background-color: #45a049;
+  }

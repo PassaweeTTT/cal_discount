@@ -7,6 +7,7 @@
                 <img [src]="item.imageUrl" alt="{{ item.name }}" class="cart-item-image">
                 <div class="cart-item-details">
                     <h3 class="item-name">{{ item.name }}</h3>
+                    <label class="category-name">Category : {{ item.category }}</label>
                     <label>{{ item.price | number:'1.2-2' }} ฿</label>
                 </div>
             </div>
@@ -30,20 +31,108 @@
         </div>
     </ng-template>
 
+
+
     <div class="coupon-section">
-        <input [(ngModel)]="couponCode" placeholder="กรอกรหัสคูปอง" />
-        <button (click)="applyCoupon(couponCode)">Apply Coupon</button>
-
-        <div class="applied-coupons">
-            <p *ngFor="let coupon of appliedCoupons">{{ coupon }} <button (click)="removeCoupon(coupon)">ลบ</button>
-            </p>
+        <div class="d-flex justify-content-between align-items-center">
+            <label class="text-link" (click)="showCouponList()">Coupon List</label>
+            <label class="text-link" (click)="showAddCouponModal()">Add New Coupon</label>
         </div>
-    </div>
-
-    <div class="cart-summary">
-        <h3>สรุปยอด</h3>
-        <p>ยอดรวมสินค้า: {{ cart.totalAmount | number:'1.2-2' }} ฿</p>
-        <p>ส่วนลดจากคูปอง: {{ discount | number:'1.2-2' }} ฿</p>
-        <p>ยอดที่ต้องชำระ: {{ finalAmount | number:'1.2-2' }} ฿</p>
+        <input [(ngModel)]="couponInput" placeholder="Coupon Code" />
+        <button (click)="applyCoupon()">Apply Coupon</button>
     </div>
 </div>
+
+<ng-template #couponTemplate>
+    <div class="modal-header">
+        <h4 class="modal-title pull-left">Coupon</h4>
+        <button type="button" class="btn-close close pull-right" aria-label="Close" (click)="modalRef?.hide()">
+            <span aria-hidden="true" class="visually-hidden">&times;</span>
+        </button>
+    </div>
+
+    <div class="modal-body">
+        <div class="coupon-container" *ngIf="couponList.length > 0; else noCoupons">
+            <div *ngFor="let coupon of couponList" class="coupon-item">
+                <div class="coupon-header">
+                    <label class="coupon-name">{{coupon.description}}</label>
+                    <label *ngIf="coupon.isCustom" class="delete-link"
+                        (click)="onDeleteCoupon(coupon.code)">Delete</label>
+                </div>
+                <div class="d-flex gap-3 align-items-center">
+                    <label class="coupon-code">{{coupon.code}}</label>
+                    <button class="copy-btn" (click)="onApplyFromList(coupon.code)">
+                        Apply
+                    </button>
+                </div>
+                <div class="coupon-details">
+                    <label class="coupon-discount">Discount: {{ coupon.amount | number }} {{coupon.isPercent ?
+                        '%' : '฿'}}</label>
+                </div>
+            </div>
+        </div>
+
+        <ng-template #noCoupons>
+            <p>No coupons available.</p>
+        </ng-template>
+    </div>
+</ng-template>
+
+<ng-template #newCouponTemplate>
+    <div class="modal-header">
+        <h4 class="modal-title pull-left">Add New Coupon</h4>
+        <button type="button" class="btn-close close pull-right" aria-label="Close" (click)="modalRef?.hide()">
+            <span aria-hidden="true" class="visually-hidden">&times;</span>
+        </button>
+    </div>
+
+    <div class="modal-body">
+        <form (ngSubmit)="onConfirmAddCoupon()" #couponForm="ngForm">
+
+            <label class="coupon-name">Summary</label>
+
+            <div class="coupon-item">
+                <div class="coupon-header">
+                    <label class="coupon-name">{{newCoupon.description}}</label>
+                </div>
+                <div class="d-flex gap-3 align-items-center">
+                    <label class="coupon-code">{{newCoupon.code}}</label>
+                    <button *ngIf="newCoupon.code" class="copy-btn" (click)="onApplyFromList(newCoupon.code)">
+                        Copy
+                    </button>
+                </div>
+                <div class="coupon-details">
+                    <label class="coupon-discount">Discount: {{ newCoupon.amount | number }} {{newCoupon.isPercent ?
+                        '%' : '฿'}}</label>
+                </div>
+            </div>
+
+
+            <div class="from-row">
+                <label require for="couponName">Coupon Name</label>
+                <input class="custom-input" id="couponName" name="couponName" [(ngModel)]="newCoupon.description"
+                    type="text" />
+            </div>
+
+            <div class="from-row">
+                <label require for="couponCode">Coupon Code</label>
+                <input class="custom-input" id="couponCode" name="couponCode" [(ngModel)]="newCoupon.code"
+                    type="text" />
+            </div>
+
+            <div class="from-row">
+                <label require for="amount">Amout</label>
+                <input class="custom-input" id="amount" name="amount" [(ngModel)]="newCoupon.amount" type="number" />
+            </div>
+
+            <div class="d-flex gap-3 ">
+                <input type="checkbox" id="isPercent" name="isPercent" [(ngModel)]="newCoupon.isPercent">
+                <label for="isPercent">Percentage Discount</label><br>
+            </div>
+
+            <div class="text-end">
+                <button type="submit" class="button-submit" [disabled]="!couponForm.form.valid">Confirm</button>
+            </div>
+        </form>
+    </div>
+</ng-template>

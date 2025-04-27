@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Product } from '../models/cart.model';
+import { Product } from '../models/products.model';
 
 @Injectable({
     providedIn: 'root'
@@ -58,9 +58,20 @@ export class ProductsService {
             alert('Product description is required!');
             return false;
         }
+
+        if (!product.category) {
+            alert('Product category is required!');
+            return false;
+        }
+
         if (!product.price) {
             alert('Product price is required!');
             return false;
+        } else {
+            if (product.price < 0) {
+                alert('Product price must be greater than 0!');
+                return false;
+            }
         }
 
         const isDuplicate = products.some((p: Product) => p.name === product.name);
