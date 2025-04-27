@@ -1,0 +1,49 @@
+<div class="cart-container">
+    <h2>Cart</h2>
+
+    <div class="cart-item-container" *ngIf="cart.items.length > 0; else emptyCart">
+        <div *ngFor="let item of cart.items" class="cart-item">
+            <div class="cart-item-details-container">
+                <img [src]="item.imageUrl" alt="{{ item.name }}" class="cart-item-image">
+                <div class="cart-item-details">
+                    <h3 class="item-name">{{ item.name }}</h3>
+                    <label>{{ item.price | number:'1.2-2' }} ฿</label>
+                </div>
+            </div>
+
+            <div class="quantity-control">
+                <button (click)="updateQuantity(item, -1)">-</button>
+                <input type="number" [(ngModel)]="item.quantity" (change)="updateQuantity(item, 0)" min="1" />
+                <button (click)="updateQuantity(item, 1)">+</button>
+            </div>
+
+            <div class="cart-item-details-summary">
+                <label class="item-total">{{ item.totalPrice | number:'1.2-2' }} ฿</label>
+                <a (click)="removeFromCart(item.id)" class="delete-link">Delete</a>
+            </div>
+        </div>
+    </div>
+
+    <ng-template #emptyCart>
+        <div class="cart-item-container">
+            <p>No items in the cart.</p>
+        </div>
+    </ng-template>
+
+    <div class="coupon-section">
+        <input [(ngModel)]="couponCode" placeholder="กรอกรหัสคูปอง" />
+        <button (click)="applyCoupon(couponCode)">Apply Coupon</button>
+
+        <div class="applied-coupons">
+            <p *ngFor="let coupon of appliedCoupons">{{ coupon }} <button (click)="removeCoupon(coupon)">ลบ</button>
+            </p>
+        </div>
+    </div>
+
+    <div class="cart-summary">
+        <h3>สรุปยอด</h3>
+        <p>ยอดรวมสินค้า: {{ cart.totalAmount | number:'1.2-2' }} ฿</p>
+        <p>ส่วนลดจากคูปอง: {{ discount | number:'1.2-2' }} ฿</p>
+        <p>ยอดที่ต้องชำระ: {{ finalAmount | number:'1.2-2' }} ฿</p>
+    </div>
+</div>

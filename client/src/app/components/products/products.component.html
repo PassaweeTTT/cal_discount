@@ -1,0 +1,67 @@
+<div class="product-header-container">
+    <h2>Product List</h2>
+    <button class="add-product-button" (click)="onNewProductClick()">Add New Item</button>
+</div>
+
+<div class="product-container">
+    <div *ngFor="let item of products" class="product-card">
+        <div class="h-100">
+            <img [src]="item.imageUrl" [alt]="item.name" class="product-image">
+        </div>
+        <div class="product-details">
+            <h3>{{ item.name }}</h3>
+            <p class="delete-link" (click)="onDeleteProduct(item.id)" *ngIf="item.isCustom">Delete</p>
+        </div>
+
+        <p class="product-description">{{ item.description }}</p>
+
+        <label>{{ item.price | number:'1.2-2' }} ฿</label>
+
+        <div class="text-center">
+            <button (click)="addToCart(item)">Add To Cart</button>
+        </div>
+    </div>
+</div>
+
+
+<ng-template #newItemTemplate>
+    <div class="modal-header">
+        <h4 class="modal-title pull-left">Add New Product</h4>
+        <button type="button" class="btn-close close pull-right" aria-label="Close" (click)="modalRef?.hide()">
+            <span aria-hidden="true" class="visually-hidden">&times;</span>
+        </button>
+    </div>
+
+    <div class="modal-body">
+        <form (ngSubmit)="onConfirmAddProduct()" #productForm="ngForm">
+            <div *ngIf="newProduct.imageUrl" class="image-preview">
+                <img [src]="newProduct.imageUrl" alt="Product Image" />
+            </div>
+
+            <div class="from-row">
+                <label require for="productName">Product Name</label>
+                <input id="productName" name="productName" [(ngModel)]="newProduct.name" type="text" />
+            </div>
+
+            <div class="from-row">
+                <label require for="productDescription">Product Description</label>
+                <textarea id="productDescription" name="productDescription"
+                    [(ngModel)]="newProduct.description"></textarea>
+            </div>
+
+            <div class="from-row">
+                <label require for="productPrice">Price</label>
+                <input id="productPrice" name="productPrice" [(ngModel)]="newProduct.price" type="number" />
+            </div>
+
+            <div class="from-row">
+                <label for="productImageUrl">URL Image</label>
+                <input id="productImageUrl" name="productImageUrl" [(ngModel)]="newProduct.imageUrl" type="url" />
+            </div>
+
+            <div class="text-end">
+                <button type="submit" [disabled]="!productForm.form.valid">Confirm</button>
+            </div>
+        </form>
+    </div>
+</ng-template>

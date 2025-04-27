@@ -1,0 +1,42 @@
+.container {
+    display: flex;
+    height: 100vh;
+    padding: 20px;
+    gap: 20px;
+    min-width: 600px;
+    width: 100%;
+}
+
+.wrapper {
+    overflow-x: auto;
+}
+
+.product {
+    flex: 7;
+    background-color: #f0f0f0;
+    border-radius: 8px;
+    padding: 20px;
+    overflow-y: auto;
+}
+
+.cart {
+    flex: 3;
+    background-color: #f0f0f0;
+    border-radius: 8px;
+    padding: 20px;
+    overflow-y: auto;
+}
+
+@media (max-width: 768px) {
+    .container {
+        flex-direction: column;
+        height: auto;
+        min-width: unset;
+    }
+
+    .product,
+    .cart {
+        flex: none;
+        width: 100%;
+    }
+}

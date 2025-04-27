@@ -66,3 +66,7 @@ D:\Myproject\Research\cal_discount\api\obj\Debug\net8.0\refint\api.dll
 D:\Myproject\Research\cal_discount\api\obj\Debug\net8.0\api.pdb
 D:\Myproject\Research\cal_discount\api\obj\Debug\net8.0\api.genruntimeconfig.cache
 D:\Myproject\Research\cal_discount\api\obj\Debug\net8.0\ref\api.dll
+D:\Project\cal_discount\api\bin\Debug\net8.0\api.staticwebassets.endpoints.json
+D:\Project\cal_discount\api\obj\Debug\net8.0\staticwebassets.build.endpoints.json
+D:\Project\cal_discount\api\obj\Debug\net8.0\staticwebassets\msbuild.api.Microsoft.AspNetCore.StaticWebAssetEndpoints.props
+D:\Project\cal_discount\api\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt

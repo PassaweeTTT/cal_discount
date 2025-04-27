@@ -1,1 +1,17 @@
 /* You can add global styles to this file, and also import other style files */
+.from-row {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 20px;
+}
+
+.delete-link {
+    margin-top: 4px;
+    color: #f44336;
+    cursor: pointer;
+    text-decoration: underline;
+    font-size: 10px;
+    width: 100%;
+    max-width: fit-content;
+}
