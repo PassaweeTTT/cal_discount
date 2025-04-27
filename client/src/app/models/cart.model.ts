@@ -1,3 +1,5 @@
+import { Coupon } from "./coupon.model";
+
 export interface CartItem {
     id: number;
     name: string;
@@ -5,6 +7,7 @@ export interface CartItem {
     quantity: number;
     totalPrice: number;
     imageUrl: string;
+    category: string;
 }
 
 export interface Cart {
@@ -12,24 +15,8 @@ export interface Cart {
     totalAmount: number;
 }
 
-export interface Product {
-    id: number;
-    name: string;
-    price: number;
-    description: string;
-    imageUrl: string;
-    category: string;
-    isCustom?: boolean;
-}
-
 export interface CheckoutModel {
     cart: Cart;
     coupon: Coupon[];
 }
 
-export interface Coupon {
-    code: string;
-    amount: number;
-    isPercent: boolean;
-    category: string;
-}

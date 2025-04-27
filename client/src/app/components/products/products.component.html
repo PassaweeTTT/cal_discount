@@ -5,18 +5,22 @@
 
 <div class="product-container">
     <div *ngFor="let item of products" class="product-card">
-        <img [src]="item.imageUrl" [alt]="item.name" class="product-image">
+        <div class="img-container">
+            <img *ngIf="item.imageUrl" [src]="item.imageUrl" [alt]="item.name" class="product-image">
+        </div>
+
         <div class="product-details">
-            <h3>{{ item.name }}</h3>
+            <label>{{ item.name }}</label>
             <p class="delete-link" (click)="onDeleteProduct(item.id)" *ngIf="item.isCustom">Delete</p>
         </div>
 
         <p class="product-description">{{ item.description }}</p>
 
+        <label>Category : {{ item.category }}</label>
         <label>{{ item.price | number:'1.2-2' }} ฿</label>
 
         <div class="text-center">
-            <button (click)="addToCart(item)">Add To Cart</button>
+            <button class="button-add" (click)="addToCart(item)">Add To Cart</button>
         </div>
     </div>
 </div>
@@ -48,6 +52,11 @@
             </div>
 
             <div class="from-row">
+                <label require for="productName">Category</label>
+                <input id="productName" name="productName" [(ngModel)]="newProduct.category" type="text" />
+            </div>
+
+            <div class="from-row">
                 <label require for="productPrice">Price</label>
                 <input id="productPrice" name="productPrice" [(ngModel)]="newProduct.price" type="number" />
             </div>
@@ -58,7 +67,7 @@
             </div>
 
             <div class="text-end">
-                <button type="submit" [disabled]="!productForm.form.valid">Confirm</button>
+                <button type="submit" class="button-submit" [disabled]="!productForm.form.valid">Confirm</button>
             </div>
         </form>
     </div>

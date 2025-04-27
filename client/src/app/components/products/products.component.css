@@ -31,7 +31,7 @@
 }
 
 .product-image {
-  width: 100%;
+  width: 80px;
   border-radius: 8px;
 }
 
@@ -174,7 +174,7 @@ input[type="url"] {
 }
 
 .image-preview img {
-  max-width: 100%;
+  max-width: 80px;
   object-fit: contain;
   border-radius: 8px;
 }
@@ -183,7 +183,7 @@ input[type="url"] {
   text-align: center;
 }
 
-button {
+.button-add {
   background-color: #4CAF50;
   color: white;
   border: none;
@@ -192,13 +192,19 @@ button {
   font-size: 16px;
   cursor: pointer;
   transition: background-color 0.3s;
+  width: 100%;
 }
 
-button:disabled {
+.button-add:disabled {
   background-color: #ddd;
   cursor: not-allowed;
 }
 
-button:hover {
+.button-add:hover {
   background-color: #45a049;
+}
+
+.img-container {
+  display: flex;
+  justify-content: center;
 }

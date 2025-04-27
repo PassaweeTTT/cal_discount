@@ -3,8 +3,9 @@ import { Component, Input, OnInit, TemplateRef, ViewChild } from '@angular/core'
 import { FormsModule } from '@angular/forms';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { RequireDirective } from '../../directives/require.directive';
-import { Cart, CartItem, Product } from '../../models/cart.model';
+import { Cart, CartItem } from '../../models/cart.model';
 import { ProductsService } from '../../services/products.service';
+import { Product } from '../../models/products.model';
 
 @Component({
     selector: 'app-products',
@@ -56,7 +57,7 @@ export class ProductsComponent implements OnInit {
             price: 0,
             imageUrl: '',
             description: '',
-            category: 'Custom Product',
+            category: '',
             isCustom: true,
         };
         this.modalRef = this.modalService.show(this.newItemTemplate, { class: 'modal-lg' });
@@ -97,6 +98,7 @@ export class ProductsComponent implements OnInit {
                 quantity: 1,
                 totalPrice: product.price,
                 imageUrl: product.imageUrl,
+                category: product.category,
             };
             this.cart.items.push(newItem);
         }
