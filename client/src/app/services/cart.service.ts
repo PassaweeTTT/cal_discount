@@ -13,7 +13,7 @@ export class CartService {
         private http: HttpClient,
     ) { }
 
-    public checkout(cart: CheckoutModel): Observable<ResponseModel> {
-        return this.http.post<ResponseModel>(`${this.url}Checkout`, cart);
+    public checkout(param: CheckoutModel): Observable<ResponseModel> {
+        return this.http.post<ResponseModel>(`${this.url}Checkout`, param);
     }
 }

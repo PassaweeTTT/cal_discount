@@ -1,4 +1,5 @@
-﻿using api.Models;
+﻿using api.Enum;
+using api.Models;
 
 namespace api.Services
 {
@@ -14,40 +15,41 @@ namespace api.Services
 
             if (param.Cart == null)
             {
-                throw new ArgumentException("Cart cannot be null.");
+                throw new Exception("Cart cannot be null.");
             }
 
             if (param.Cart.Items == null)
             {
-                throw new ArgumentException("Cart Items cannot be null.");
+                throw new Exception("Cart Items cannot be null.");
             }
 
             if (!param.Cart.Items.Any())
             {
-                throw new ArgumentException("Cart cannot be empty.");
+                throw new Exception("Cart cannot be empty.");
             }
 
             var items = param.Cart.Items;
             decimal totalAmount = CalculateTotalAmount(items);
+            decimal remainAmount = totalAmount;
 
             decimal discount = 0;
             decimal pointUsed = 0;
 
             if (param.Coupon != null && param.Coupon.Any())
             {
-                discount += CalculateCouponDiscount(param.Coupon, totalAmount);
-                discount += CalculateCategoryDiscount(param.Coupon, items);
-                discount += CalculateSeasonalDiscount(param.Coupon, totalAmount - discount);
+                ValidateCoupon(param);
+                remainAmount -= CalculateCouponDiscount(param.Coupon, totalAmount);
+                remainAmount -= CalculateOnTopDiscount(param.Coupon, items);
+                CalculatePoint(param, totalAmount, ref remainAmount, ref pointUsed);
+                remainAmount -= CalculateSeasonalDiscount(param.Coupon, remainAmount);
             }
-
-            if (param.IsPoint.GetValueOrDefault(false))
+            else
             {
-                pointUsed = CalculatePointDiscount(param.IsPoint, param.PointAmount, totalAmount);
-                discount += pointUsed;
+                CalculatePoint(param, totalAmount, ref remainAmount, ref pointUsed);
             }
 
-            discount = Math.Min(discount, totalAmount);
-            decimal finalPrice = totalAmount - discount;
+            discount = totalAmount - remainAmount;
+            decimal finalPrice = remainAmount;
 
             return new ResponseModel
             {
@@ -56,6 +58,79 @@ namespace api.Services
                 FinalPrice = finalPrice,
                 PointUsed = pointUsed
             };
+        }
+
+        private void CalculatePoint(CheckoutModel param, decimal totalAmount, ref decimal remainAmount, ref decimal pointUsed)
+        {
+            if (param.IsPoint.GetValueOrDefault(false))
+            {
+                var maxPoint = CalculatePointDiscount(param.IsPoint, param.PointAmount, totalAmount);
+                if (param.PointAmount > maxPoint)
+                    pointUsed = maxPoint;
+                else
+                    pointUsed = param.PointAmount.GetValueOrDefault(0);
+
+                remainAmount -= pointUsed;
+            }
+        }
+
+        private void ValidateCoupon(CheckoutModel param)
+        {
+            var coupon = param.Coupon;
+            if(coupon == null || !coupon.Any())
+            {
+                throw new ArgumentNullException(nameof(coupon), "Coupon cannot be null or empty.");
+            }
+            foreach (var item in coupon)
+            {
+                if (item == null)
+                {
+                    throw new ArgumentNullException(nameof(item), "Coupon cannot be null.");
+                }
+                if (string.IsNullOrWhiteSpace(item.Code))
+                {
+                    throw new Exception("Coupon code is required.");
+                }
+                if (item.Amount < 0)
+                {
+                    throw new Exception($"Coupon amount cannot lower than 0. Code: {item.Code}");
+                }
+                if (string.IsNullOrWhiteSpace(item.Category))
+                {
+                    throw new Exception($"Coupon category is required. Code: {item.Code}");
+                }
+                if(item.IsPercent && (item.Amount < 0 || item.Amount > 100))
+                {
+                    throw new Exception($"Coupon discount percentage must be between 0 and 100. Code: {item.Code}");
+                }
+                if(item.Category == EnumCouponType.OnTop)
+                {
+                    if (string.IsNullOrWhiteSpace(item.Unit))
+                    {
+                        throw new Exception($"Category To Discount is required. Code: {item.Code}");
+                    }
+                }
+                if(item.Category == EnumCouponType.Seasonal)
+                {
+                    if (item.Every == null)
+                    {
+                        throw new Exception($"Discount Every is required. Code: {item.Code}");
+                    }
+                    if (item.Every <= 0)
+                    {
+                        throw new Exception($"Discount Every cannot lower than 0. Code: {item.Code}");
+                    }
+                }
+            }
+
+            if (param.IsPoint.GetValueOrDefault(false))
+            {
+                if(coupon.Where(x => x.Category == EnumCouponType.OnTop).ToList().Count > 0)
+                {
+                    throw new Exception($"You can not use Point together with \"On Top\" coupon!");
+                }
+            }
+
         }
 
         private decimal CalculateTotalAmount(List<CartItem> items)
@@ -74,11 +149,11 @@ namespace api.Services
                 }
                 if (item.Price < 0)
                 {
-                    throw new ArgumentException($"Cart Item price cannot lower than 0. Item: {item.Name}");
+                    throw new Exception($"Cart Item price cannot lower than 0. Item: {item.Name}");
                 }
                 if (item.Quantity <= 0)
                 {
-                    throw new ArgumentException($"Cart Item quantity must be at least 1. Item: {item.Name}");
+                    throw new Exception($"Cart Item quantity must be at least 1. Item: {item.Name}");
                 }
                 total += item.Price * item.Quantity;
             }
@@ -93,12 +168,12 @@ namespace api.Services
             }
 
             var generalCoupons = coupons
-                .Where(c => c != null && !c.IsPoint.GetValueOrDefault() && c.Every == null && string.IsNullOrWhiteSpace(c.Category))
+                .Where(c => c != null && !string.IsNullOrWhiteSpace(c.Category) && c.Category == EnumCouponType.Coupon)
                 .ToList();
 
             if (generalCoupons.Count > 1)
             {
-                throw new InvalidOperationException("Multiple general coupon campaigns applied.");
+                throw new Exception("Multiple coupon campaigns can not be applied.");
             }
 
             if (generalCoupons.Count == 1)
@@ -106,16 +181,12 @@ namespace api.Services
                 var coupon = generalCoupons[0];
                 if (coupon.Amount < 0)
                 {
-                    throw new ArgumentException($"Coupon amount cannot lower than 0. Code: {coupon.Code}");
+                    throw new Exception($"Coupon amount cannot lower than 0. Code: {coupon.Code}");
                 }
 
                 if (coupon.IsPercent)
                 {
-                    if (coupon.Amount > 100)
-                    {
-                        throw new ArgumentException($"Category discount percentage must be between 0 and 100. Code: {coupon.Code}");
-                    }
-                    return totalAmount * (coupon.Amount / 100m);
+                    return (totalAmount * coupon.Amount) / 100;
                 }
                 return coupon.Amount;
             }
@@ -123,7 +194,7 @@ namespace api.Services
             return 0;
         }
 
-        private decimal CalculateCategoryDiscount(List<Coupon> coupons, List<CartItem> items)
+        private decimal CalculateOnTopDiscount(List<Coupon> coupons, List<CartItem> items)
         {
             if (coupons == null || !coupons.Any() || items == null || !items.Any())
             {
@@ -131,32 +202,37 @@ namespace api.Services
             }
 
             var categoryCoupons = coupons
-                .Where(c => c != null && !c.IsPoint.GetValueOrDefault() && c.Every == null && !string.IsNullOrWhiteSpace(c.Category))
+                .Where(c => c != null && !string.IsNullOrWhiteSpace(c.Category) && c.Category == EnumCouponType.OnTop)
                 .ToList();
 
             if (categoryCoupons.Count > 1)
             {
-                throw new InvalidOperationException("Multiple category discount campaigns applied.");
-            }
-
-            if (coupons.Any(c => c != null && c.IsPoint.GetValueOrDefault()) && categoryCoupons.Count > 0)
-            {
-                throw new InvalidOperationException("Multiple On Top campaigns applied with category discounts.");
+                throw new Exception("Multiple On Top campaigns can not be applied.");
             }
 
             if (categoryCoupons.Count == 1)
             {
                 var coupon = categoryCoupons[0];
-                if (coupon.Amount < 0 || coupon.Amount > 100)
+
+                var itemList = items.Where(i => i.Category != null && i.Category == coupon.Unit).ToList();
+
+                decimal totalAmount = 0;
+                foreach (var item in itemList)
                 {
-                    throw new ArgumentException($"Category discount percentage must be between 0 and 100. Code: {coupon.Code}");
+                    totalAmount += item.Price * item.Quantity;
                 }
 
-                decimal sum = items
-                    .Where(i => i != null && string.Equals(i.Category, coupon.Category, StringComparison.OrdinalIgnoreCase))
-                    .Sum(i => i.Price * i.Quantity);
+                if (coupon.Amount < 0)
+                {
+                    throw new Exception($"On Top amount cannot lower than 0. Code: {coupon.Code}");
+                }
 
-                return sum * (coupon.Amount / 100m);
+                if (coupon.IsPercent)
+                {
+                    return (totalAmount * coupon.Amount) / 100;
+                }
+
+                return totalAmount - coupon.Amount;
             }
 
             return 0;
@@ -171,16 +247,16 @@ namespace api.Services
 
             if (!pointAmount.HasValue)
             {
-                throw new ArgumentException("Point amount is required when Use Point.");
+                throw new Exception("Point amount is required when Use Point.");
             }
 
             if (pointAmount.Value < 0)
             {
-                throw new ArgumentException("Point amount cannot be lower than 0.");
+                throw new Exception("Point amount cannot be lower than 0.");
             }
 
-            decimal maxPoint = totalAmount * 0.2m;
-            return Math.Min(pointAmount.Value, maxPoint);
+            decimal maxPoint = (totalAmount * 20) / 100;
+            return Math.Floor(maxPoint);
         }
 
         private decimal CalculateSeasonalDiscount(List<Coupon> coupons, decimal baseAmount)
@@ -193,29 +269,24 @@ namespace api.Services
             var seasonalCoupons = coupons
                 .Where(c => c != null && c.Every.HasValue)
                 .ToList();
-
+            Console.WriteLine($"Seasonal Coupons: {seasonalCoupons.Count}");
             if (seasonalCoupons.Count > 1)
             {
-                throw new InvalidOperationException("Multiple seasonal campaigns applied.");
+                throw new Exception("Multiple seasonal campaigns can not be applied.");
             }
 
             if (seasonalCoupons.Count == 1)
             {
                 var coupon = seasonalCoupons[0];
-                if (coupon.Every == null)
+
+                if(coupon.Every == null || coupon.Every < 0)
                 {
-                    throw new ArgumentException($"Seasonal (Every) is required. Code: {coupon.Code}");
-                }
-                if (coupon.Every <= 0)
-                {
-                    throw new ArgumentException($"Seasonal (Every) cannot lower than 0. Code: {coupon.Code}");
-                }
-                if (coupon.Amount < 0)
-                {
-                    throw new ArgumentException($"Seasonal discount amount cannot lower than 0. Code: {coupon.Code}");
+                    throw new Exception($"Discount Every is required. Code: {coupon.Code}");
                 }
 
-                var times = Math.Floor(baseAmount / coupon.Every.Value);
+                decimal couponEvery = coupon.Every.Value;
+
+                var times = Math.Floor(baseAmount / couponEvery);
                 return times * coupon.Amount;
             }
 

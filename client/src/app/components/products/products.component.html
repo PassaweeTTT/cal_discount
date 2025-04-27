@@ -5,13 +5,13 @@
 
 <div class="product-container">
     <div *ngFor="let item of products" class="product-card">
-        <div class="img-container">
-            <img *ngIf="item.imageUrl" [src]="item.imageUrl" [alt]="item.name" class="product-image">
-        </div>
-
         <div class="product-details">
             <label>{{ item.name }}</label>
             <p class="delete-link" (click)="onDeleteProduct(item.id)" *ngIf="item.isCustom">Delete</p>
+        </div>
+
+        <div class="img-container">
+            <img *ngIf="item.imageUrl" [src]="item.imageUrl" [alt]="item.name" class="product-image">
         </div>
 
         <p class="product-description">{{ item.description }}</p>

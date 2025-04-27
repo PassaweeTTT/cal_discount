@@ -1,5 +1,8 @@
-﻿var builder = WebApplication.CreateBuilder(args);
+﻿using api.Services;
 
+var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddScoped<IProcessService, ProcessService>();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

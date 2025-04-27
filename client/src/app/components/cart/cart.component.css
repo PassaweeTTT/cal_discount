@@ -73,7 +73,7 @@
 }
 
 .item-total {
-  color: #45a049;
+  color: #0056b3;
 }
 
 .coupon-section {
@@ -93,7 +93,7 @@
 }
 
 button {
-  background-color: #4CAF50;
+  background-color: rgb(250, 55, 74);
   color: white;
   padding: 8px 16px;
   border: none;
@@ -103,7 +103,7 @@ button {
 }
 
 button:hover {
-  background-color: #45a049;
+  background-color: #0056b3;
 }
 
 .item-name,
@@ -148,7 +148,7 @@ button:hover {
 
 /* mini */
 .copy-btn {
-  background-color: #007bff;
+  background-color: rgb(250, 55, 74);
   color: white;
   border: none;
   padding: 5px 10px;
@@ -173,4 +173,45 @@ button:hover {
   border: 1px solid #ccc;
   border-radius: 4px;
   box-sizing: border-box;
+}
+
+.cart-summary {
+  padding: 20px;
+}
+
+.price-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.total-price {
+  color: #e74c3c;
+}
+
+.discount-info {
+  font-size: 1.2rem;
+  margin-bottom: 20px;
+}
+
+.discount {
+  color: #2ecc71;
+}
+
+.final-price {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #3498db;
+}
+
+.points-info {
+  font-size: 1rem;
+  color: #7f8c8d;
+}
+
+.points-info p {
+  margin: 5px 0;
 }

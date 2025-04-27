@@ -27,7 +27,9 @@
 
     <ng-template #emptyCart>
         <div class="cart-item-container">
-            <p>No items in the cart.</p>
+            <div class="d-flex w-100 justify-content-center align-items-center flex-column">
+                <p>Your cart is empty.</p>
+            </div>
         </div>
     </ng-template>
 
@@ -71,6 +73,26 @@
         </div>
 
         <button (click)="checkout()">Check Out</button>
+
+        <div class="cart-item-container" *ngIf="response">
+            <div class="cart-summary">
+                <div class="price-container">
+                    <span class="total-price"
+                        [ngStyle]="{ 'text-decoration': response.totalPrice > response.finalPrice ? 'line-through' : 'none' }">
+                        {{ response.totalPrice }} ฿
+                    </span>
+                </div>
+
+                <div class="discount-info">
+                    <p class="discount">Discount: {{ response.discount }} ฿</p>
+                    <p class="final-price">Final Price: {{ response.finalPrice }} ฿</p>
+                </div>
+
+                <div class="points-info">
+                    <p>Points Used: {{ response.pointUsed }} points</p>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 

@@ -20,9 +20,18 @@ namespace api.Controllers
         [Route("Checkout")]
         public IActionResult Checkout(CheckoutModel param)
         {
-            _processService.ProcessCheckout(param);
+            ResponseModel result = new ResponseModel();
 
-            return Ok(new { Message = "OK" });
+            try
+            {
+                result = _processService.ProcessCheckout(param);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+
+            return Ok(result);
         }
     }
 }

@@ -23,6 +23,10 @@ export const catchErrorHandler = ((httpErrorResponse: HttpErrorResponse) => {
                 let messages: string[] = httpErrorResponse.error.errorMessage;
                 let concat = messages.join("<br>");
                 alert(concat);
+            } else if (httpErrorResponse?.error?.message) {
+                let messages: string[] = httpErrorResponse.error.message.split(',,,');
+                let concat = messages.join("<br>");
+                alert(concat);
             }
         } else {
             alert('Http failure response')
