@@ -131,3 +131,5 @@ dist
 /api/obj
 /.vs
 /api/bin
+/api.Tests/bin
+/api.Tests/bin/Debug/net8.0
