@@ -46,8 +46,17 @@
                     (change)="onPointAmountChange()">
                 <label for="isUsePoint">Use Point To Discount</label>
             </div>
+
             <input class="custom-input" id="pointAmount" name="pointAmount" [(ngModel)]="pointAmount" type="number"
                 *ngIf="isUsePoint" type="search" />
+
+            <div class="d-flex flex-column" *ngIf="isUsePoint">
+                <label *ngIf="isUsePoint" class="text-danger">*1 Point = 1 ฿</label>
+                <label *ngIf="isUsePoint" class="text-danger">*Points can be used for up to 20% of the total
+                    price</label>
+                <label *ngIf="isUsePoint" class="text-danger">*Points cannot be used together with the "On Top"
+                    Coupon</label>
+            </div>
         </div>
 
         <div class="coupon-container" *ngIf="couponUseList.length > 0">
@@ -66,8 +75,15 @@
                     <label class="coupon-code">Code :{{coupon.code}}</label>
                 </div>
                 <div class="coupon-details">
-                    <label class="coupon-discount">Discount: {{ coupon.amount | number }} {{coupon.isPercent ?
-                        '%' : '฿'}}</label>
+                    <label class="coupon-discount" *ngIf="coupon.amount">
+                        Discount: {{ coupon.amount | number }} {{coupon.isPercent ? '%' : '฿'}},
+                    </label>
+                    <label class="coupon-discount" *ngIf="coupon.category == EnumCouponType.OnTop">
+                        Category : {{coupon.unit}}
+                    </label>
+                    <label class="coupon-discount" *ngIf="coupon.category == EnumCouponType.Seasonal">
+                        Discount Every : {{coupon.every | number}} ฿
+                    </label>
                 </div>
             </div>
         </div>
@@ -84,8 +100,8 @@
                 </div>
 
                 <div class="discount-info">
-                    <p class="discount">Discount: {{ response.discount }} ฿</p>
                     <p class="final-price">Final Price: {{ response.finalPrice }} ฿</p>
+                    <p class="discount">Discount: {{ response.discount }} ฿</p>
                 </div>
 
                 <div class="points-info">
@@ -127,8 +143,15 @@
                     </button>
                 </div>
                 <div class="coupon-details">
-                    <label class="coupon-discount">Discount: {{ coupon.amount | number }} {{coupon.isPercent ?
-                        '%' : '฿'}}</label>
+                    <label class="coupon-discount" *ngIf="coupon.amount">
+                        Discount: {{ coupon.amount | number }} {{coupon.isPercent ? '%' : '฿'}},
+                    </label>
+                    <label class="coupon-discount" *ngIf="coupon.category == EnumCouponType.OnTop">
+                        Category : {{coupon.unit}}
+                    </label>
+                    <label class="coupon-discount" *ngIf="coupon.category == EnumCouponType.Seasonal">
+                        Discount Every : {{coupon.every | number}} ฿
+                    </label>
                 </div>
             </div>
         </div>
@@ -166,10 +189,10 @@
 
         <form (ngSubmit)="onConfirmAddCoupon()" #couponForm="ngForm">
 
-            <label class="coupon-name"
-                *ngIf="newCoupon.description || newCoupon.code || newCoupon.amount">Summary</label>
+            <label class="coupon-name mt-3">Summary</label>
 
-            <div class="coupon-item" *ngIf="newCoupon.description || newCoupon.code || newCoupon.amount">
+            <div class="coupon-preview"
+                *ngIf="newCoupon.description || newCoupon.code || newCoupon.amount; else noSummary">
                 <div class="coupon-header" *ngIf="newCoupon.description">
                     <label class="coupon-name">{{newCoupon.description}}</label>
                 </div>
@@ -181,47 +204,63 @@
                     <label class="coupon-code">{{newCoupon.code}}</label>
                 </div>
 
-                <div class="coupon-details" *ngIf="newCoupon.amount">
-                    <label class="coupon-discount">Discount: {{ newCoupon.amount | number }} {{newCoupon.isPercent ?
-                        '%' : '฿'}}</label>
+                <div class="coupon-details">
+                    <label class="coupon-discount" *ngIf="newCoupon.amount">
+                        Discount: {{ newCoupon.amount | number }} {{newCoupon.isPercent ? '%' : '฿'}},
+                    </label>
+                    <label class="coupon-discount" *ngIf="newCoupon.category == EnumCouponType.OnTop">
+                        Category : {{newCoupon.unit}}
+                    </label>
+                    <label class="coupon-discount" *ngIf="newCoupon.category == EnumCouponType.Seasonal">
+                        Discount Every : {{newCoupon.every | number}} ฿
+                    </label>
                 </div>
             </div>
 
+            <ng-template #noSummary>
+                <div class="coupon-preview">
+                    <p>No Coupon Details</p>
+                </div>
+            </ng-template>
 
-            <div class="from-row">
-                <label require for="couponName">Coupon Name</label>
-                <input class="custom-input" id="couponName" name="couponName" [(ngModel)]="newCoupon.description"
-                    type="text" />
-            </div>
+            <div *ngIf="newCoupon.category">
+                <div class="from-row">
+                    <label require for="couponName">Coupon Name</label>
+                    <input class="custom-input" id="couponName" name="couponName" [(ngModel)]="newCoupon.description"
+                        type="text" />
+                </div>
 
-            <div class="from-row">
-                <label require for="couponCode">Coupon Code</label>
-                <input class="custom-input" id="couponCode" name="couponCode" [(ngModel)]="newCoupon.code"
-                    type="text" />
-            </div>
+                <div class="from-row">
+                    <label require for="couponCode">Coupon Code</label>
+                    <input class="custom-input" id="couponCode" name="couponCode" [(ngModel)]="newCoupon.code"
+                        type="text" />
+                </div>
 
-            <div class="d-flex gap-3 " *ngIf="newCoupon.category != EnumCouponType.Seasonal">
-                <input type="checkbox" id="isPercent" name="isPercent" [(ngModel)]="newCoupon.isPercent">
-                <label for="isPercent">Percentage Discount</label><br>
-            </div>
+                <div class="d-flex gap-3 " *ngIf="newCoupon.category != EnumCouponType.Seasonal">
+                    <input type="checkbox" id="isPercent" name="isPercent" [(ngModel)]="newCoupon.isPercent">
+                    <label for="isPercent">Percentage Discount</label><br>
+                </div>
 
-            <div class="from-row">
-                <label require for="amount">Amout {{newCoupon.isPercent ? '(%)' : '(฿)'}}</label>
-                <input class="custom-input" id="amount" name="amount" [(ngModel)]="newCoupon.amount" type="number" />
-            </div>
+                <div class="from-row">
+                    <label require for="amount">Amout {{newCoupon.isPercent ? '(%)' : '(฿)'}}</label>
+                    <input class="custom-input" id="amount" name="amount" [(ngModel)]="newCoupon.amount"
+                        type="number" />
+                </div>
 
-            <div class="from-row" *ngIf="newCoupon.category == EnumCouponType.OnTop">
-                <label require for="category">Category To Discount</label>
-                <input class="custom-input" id="category" name="category" [(ngModel)]="newCoupon.unit" type="text" />
-            </div>
+                <div class="from-row" *ngIf="newCoupon.category == EnumCouponType.OnTop">
+                    <label require for="category">Category To Discount</label>
+                    <input class="custom-input" id="category" name="category" [(ngModel)]="newCoupon.unit"
+                        type="text" />
+                </div>
 
-            <div class="from-row" *ngIf="newCoupon.category == EnumCouponType.Seasonal">
-                <label require for="every">Discount Every (฿)</label>
-                <input class="custom-input" id="every" name="every" [(ngModel)]="newCoupon.every" type="number" />
-            </div>
+                <div class="from-row" *ngIf="newCoupon.category == EnumCouponType.Seasonal">
+                    <label require for="every">Discount Every (฿)</label>
+                    <input class="custom-input" id="every" name="every" [(ngModel)]="newCoupon.every" type="number" />
+                </div>
 
-            <div class="text-end">
-                <button type="submit" class="button-submit" [disabled]="!couponForm.form.valid">Confirm</button>
+                <div class="text-end">
+                    <button type="submit" class="button-submit" [disabled]="!couponForm.form.valid">Confirm</button>
+                </div>
             </div>
         </form>
     </div>

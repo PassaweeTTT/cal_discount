@@ -158,7 +158,7 @@ button:hover {
 }
 
 .remove-btn {
-  background-color: #af0600;
+  background-color: #020070;
   color: white;
   border: none;
   padding: 5px 10px;
@@ -176,7 +176,7 @@ button:hover {
 }
 
 .cart-summary {
-  padding: 20px;
+  padding: 10px;
 }
 
 .price-container {
@@ -185,7 +185,6 @@ button:hover {
   align-items: center;
   font-size: 1.5rem;
   font-weight: bold;
-  margin-bottom: 20px;
 }
 
 .total-price {
@@ -214,4 +213,24 @@ button:hover {
 
 .points-info p {
   margin: 5px 0;
+}
+
+.coupon-preview {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: #fff;
+  min-height: 40px;
+}
+
+.coupon-details{
+  display: flex;
+  gap: 4px;
+}
+
+.text-danger{
+  font-size: 12px;
 }
