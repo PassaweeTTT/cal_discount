@@ -1,26 +1,31 @@
 # Discount Calculator
 
 ## Developer
-Passawee Wanwilai (Tan)
+**Passawee Wanwilai (Tan)**
 
 ## Tech Stack
 - **Frontend**: Angular
 - **Backend**: ASP.NET 8
 
-## Source Code
-You can view the source code from this Git repository
+## Live Demo
+You can try out the application here:  
+👉 [https://tt-shop.netlify.app/](https://tt-shop.netlify.app/)
 
-## How to Run the Application
-If you want to try out this project:
-1. Open the `run` folder in the Git repository: `cal_discount\run`.
-2. Run the application by opening the `appRun.bat` file.
+The application is hosted with:
+- Frontend on **Netlify**
+- Backend API on **Azure**
+
+## Source Code
+If you would like to review the source code:
+- Frontend (Angular): [`/client`](./client)
+- Backend (ASP.NET API): [`/api`](./api)
 
 ## App Features
-1. Ability to add products to the shopping cart.
-2. Create custom products as per user requirements.
-3. Use discount coupons during checkout.
-4. Create custom discount coupons.
+- 🛒 Add products to the shopping cart
+- 🛠️ Create custom products
+- 🎟️ Apply discount coupons during checkout
+- ✏️ Create and manage custom discount coupons
 
 ## Contact
-If you have any questions or need further assistance, feel free to reach out to me via:
-- Email: [w.passawee.work@gmail.com](mailto:w.passawee.work@gmail.com)
+For any questions or feedback, feel free to contact me:  
+📧 [w.passawee.work@gmail.com](mailto:w.passawee.work@gmail.com)
