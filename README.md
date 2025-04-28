@@ -12,7 +12,7 @@ You can view the source code from this Git repository
 
 ## How to Run the Application
 If you want to try out this project:
-1. Download the files from this link: [Download](https://drive.google.com/file/d/1260FGjaifYIhRGff3i7ojic6iYsDT3S_/view?usp=sharing)
+1. Open the `run` folder in the Git repository: `cal_discount\run`.
 2. Run the application by opening the `appRun.bat` file.
 
 ## App Features
