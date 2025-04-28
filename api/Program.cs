@@ -11,21 +11,16 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("CorePolicy", policy =>
     {
-        policy.WithOrigins("http://localhost:4200")  // กำหนดให้อนุญาตแค่ origin นี้
-              .AllowAnyMethod()  // อนุญาตให้ใช้ทุก HTTP method
-              .AllowAnyHeader()  // อนุญาตให้ใช้ทุก header
-              .AllowCredentials();  // อนุญาตให้ส่ง cookies หรือ credentials
+        policy.AllowAnyOrigin() 
+              .AllowAnyHeader()
+              .AllowAnyMethod();
     });
 });
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.UseCors("CorePolicy");
 

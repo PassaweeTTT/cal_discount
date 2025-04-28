@@ -7,7 +7,7 @@ import { CheckoutModel, ResponseModel } from '../models/cart.model';
     providedIn: 'root'
 })
 export class CartService {
-    public url = `https://localhost:7110/api/cart/`;
+    public url = `http://localhost:5000/api/cart/`;
 
     constructor(
         private http: HttpClient,
